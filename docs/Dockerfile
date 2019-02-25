@@ -1,18 +1,18 @@
 FROM alpine:3.7 as builder
 
 RUN apk update
-RUN apk add make openssl-dev pcre-dev zlib-dev wget tar build-base ca-certificates gettext # bash git curl gnupg
+RUN apk add make openssl-dev pcre-dev zlib-dev wget tar build-base ca-certificates gettext bash curl
 ENV KUBE_LATEST_VERSION="v1.10.2"
 # Note: Latest version of helm may be found at:
 # https://github.com/kubernetes/helm/releases
 ENV HELM_VERSION="v2.9.1"
 
-# RUN wget -q https://storage.googleapis.com/kubernetes-release/release/${KUBE_LATEST_VERSION}/bin/linux/amd64/kubectl -O /usr/local/bin/kubectl \
-#    && chmod +x /usr/local/bin/kubectl \
-#    && wget -q http://storage.googleapis.com/kubernetes-helm/helm-${HELM_VERSION}-linux-amd64.tar.gz -O - | tar -xzO linux-amd64/helm > /usr/local/bin/helm \
-#    && chmod +x /usr/local/bin/helm \
-#    && helm init --client-only \
-#    && helm plugin install https://github.com/futuresimple/helm-secrets
+ RUN wget -q https://storage.googleapis.com/kubernetes-release/release/${KUBE_LATEST_VERSION}/bin/linux/amd64/kubectl -O /usr/local/bin/kubectl \
+    && chmod +x /usr/local/bin/kubectl \
+    && wget -q http://storage.googleapis.com/kubernetes-helm/helm-${HELM_VERSION}-linux-amd64.tar.gz -O - | tar -xzO linux-amd64/helm > /usr/local/bin/helm \
+    && chmod +x /usr/local/bin/helm \
+    && helm init --client-only \
+    && helm plugin install https://github.com/futuresimple/helm-secrets
 RUN wget -O njs.tar.gz https://hg.nginx.org/njs/archive/0.1.15.tar.gz && \
     wget -O nginx.tar.gz https://nginx.org/download/nginx-1.13.10.tar.gz && \
     tar xzvf njs.tar.gz && \
@@ -46,14 +46,14 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
 WORKDIR /kubebox
 
 # Client
-COPY libs /usr/share/nginx/html/libs/
-COPY fonts /usr/share/nginx/html/fonts/
-COPY index.html kubebox.js /usr/share/nginx/html/
+COPY ./docs/libs /usr/share/nginx/html/libs/
+COPY ./docs/fonts /usr/share/nginx/html/fonts/
+COPY ./docs/index.html ./docs/kubebox.js /usr/share/nginx/html/
 
 # Server
-COPY nginx.conf /etc/nginx/conf.d/
-COPY nginx.sh ./
-COPY nginx.js ./nginx.tpl.js
+COPY ./docs/nginx.conf /etc/nginx/conf.d/
+COPY ./docs/nginx.sh ./
+COPY ./docs/nginx.js ./nginx.tpl.js
 
 RUN touch nginx.js && \
     chown 998 nginx.js && chmod 777 nginx.js && \
