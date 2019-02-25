@@ -2,18 +2,6 @@ FROM alpine:3.7 as builder
 
 RUN apk update
 RUN apk add make openssl-dev pcre-dev zlib-dev wget tar build-base ca-certificates gettext
-
-RUN wget -O njs.tar.gz https://hg.nginx.org/njs/archive/0.1.15.tar.gz && \
-    wget -O nginx.tar.gz https://nginx.org/download/nginx-1.13.10.tar.gz && \
-    tar xzvf njs.tar.gz && \
-    tar xzvf nginx.tar.gz && \
-    cd nginx-* && ./configure --with-compat --add-dynamic-module=../njs*/nginx && \
-    make modules && \
-    rm -f ../*.tar.gz
-
-FROM nginx:1.13.10-alpine
-# Note: Latest version of kubectl may be found at:
-# https://aur.archlinux.org/packages/kubectl-bin/
 ENV KUBE_LATEST_VERSION="v1.10.2"
 # Note: Latest version of helm may be found at:
 # https://github.com/kubernetes/helm/releases
@@ -26,6 +14,17 @@ RUN apk add --no-cache bash git curl gnupg \
     && chmod +x /usr/local/bin/helm \
     && helm init --client-only \
     && helm plugin install https://github.com/futuresimple/helm-secrets
+RUN wget -O njs.tar.gz https://hg.nginx.org/njs/archive/0.1.15.tar.gz && \
+    wget -O nginx.tar.gz https://nginx.org/download/nginx-1.13.10.tar.gz && \
+    tar xzvf njs.tar.gz && \
+    tar xzvf nginx.tar.gz && \
+    cd nginx-* && ./configure --with-compat --add-dynamic-module=../njs*/nginx && \
+    make modules && \
+    rm -f ../*.tar.gz
+
+FROM nginx:1.13.10-alpine
+# Note: Latest version of kubectl may be found at:
+# https://aur.archlinux.org/packages/kubectl-bin/
     
 ENV LANG C.UTF-8
 
