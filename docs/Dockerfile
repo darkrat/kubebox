@@ -2,6 +2,13 @@ FROM alpine:3.7 as builder
 
 RUN apk update
 RUN apk add make openssl-dev pcre-dev zlib-dev wget tar build-base ca-certificates gettext
+RUN apk add --no-cache bash git curl gnupg \
+    && wget -q https://storage.googleapis.com/kubernetes-release/release/${KUBE_LATEST_VERSION}/bin/linux/amd64/kubectl -O /usr/local/bin/kubectl \
+    && chmod +x /usr/local/bin/kubectl \
+    && wget -q http://storage.googleapis.com/kubernetes-helm/helm-${HELM_VERSION}-linux-amd64.tar.gz -O - | tar -xzO linux-amd64/helm > /usr/local/bin/helm \
+    && chmod +x /usr/local/bin/helm \
+    && helm init --client-only \
+    && helm plugin install https://github.com/futuresimple/helm-secrets
 RUN wget -O njs.tar.gz https://hg.nginx.org/njs/archive/0.1.15.tar.gz && \
     wget -O nginx.tar.gz https://nginx.org/download/nginx-1.13.10.tar.gz && \
     tar xzvf njs.tar.gz && \
