@@ -1,7 +1,7 @@
 FROM alpine:3.7 as builder
 
 RUN apk update
-RUN apk add make openssl-dev pcre-dev zlib-dev wget tar build-base ca-certificates gettext bash curl
+RUN apk add make openssl-dev pcre-dev zlib-dev wget tar build-base ca-certificates gettext bash curl git
 ENV KUBE_LATEST_VERSION="v1.10.2"
 # Note: Latest version of helm may be found at:
 # https://github.com/kubernetes/helm/releases
